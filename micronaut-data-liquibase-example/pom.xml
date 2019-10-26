@@ -15,6 +15,27 @@
         <exec.mainClass>micronaut.data.liquibase.example.Application</exec.mainClass>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+
+        <!-- Plugins -->
+        <docker-maven-plugin.version>0.31.0</docker-maven-plugin.version>
+        <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+        <gmavenplus-plugin.version>1.6.2</gmavenplus-plugin.version>
+        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+        <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+
+        <!-- Docker container -->
+        <postgres.docker.name>postgres:latest</postgres.docker.name>
+        <postgres.docker.log.prefix>postgres</postgres.docker.log.prefix>
+        <postgres.docker.ports.1>5432:5432</postgres.docker.ports.1>
+        <postgres.docker.env.POSTGRES_DB>example</postgres.docker.env.POSTGRES_DB>
+        <postgres.docker.envRun.POSTGRES_USER>example</postgres.docker.envRun.POSTGRES_USER>
+        <postgres.docker.envRun.POSTGRES_PASSWORD>example</postgres.docker.envRun.POSTGRES_PASSWORD>
+        <postgres.docker.wait.time>10000</postgres.docker.wait.time>
+        <postgres.docker.wait.log>ready to accept connections</postgres.docker.wait.log>
+
     </properties>
     <repositories>
         <repository>
@@ -22,8 +43,10 @@
             <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
+
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>io.micronaut</groupId>
                 <artifactId>micronaut-bom</artifactId>
@@ -34,75 +57,88 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+
         <dependency>
             <groupId>io.micronaut</groupId>
             <artifactId>micronaut-http-client</artifactId>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>io.micronaut</groupId>
             <artifactId>micronaut-inject</artifactId>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>io.micronaut</groupId>
             <artifactId>micronaut-validation</artifactId>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>io.micronaut</groupId>
             <artifactId>micronaut-runtime</artifactId>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
-            <groupId>io.micronaut.configuration</groupId>
-            <artifactId>micronaut-hibernate-jpa</artifactId>
-            <scope>compile</scope>
+            <groupId>io.micronaut.data</groupId>
+            <artifactId>micronaut-data-hibernate-jpa</artifactId>
+            <version>1.0.0.M4</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.8</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
         <dependency>
             <groupId>io.micronaut.configuration</groupId>
             <artifactId>micronaut-jdbc-tomcat</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>io.micronaut.configuration</groupId>
-            <artifactId>micronaut-liquibase</artifactId>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>io.micronaut</groupId>
             <artifactId>micronaut-http-server-netty</artifactId>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
             <scope>runtime</scope>
         </dependency>
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.micronaut.test</groupId>
-            <artifactId>micronaut-test-junit5</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
+            <version>1.2-groovy-2.4</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -111,23 +147,28 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>io.micronaut</groupId>
-            <artifactId>micronaut-inject-groovy</artifactId>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-json</artifactId>
+            <version>2.5.8</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>io.micronaut.test</groupId>
-            <artifactId>micronaut-test-spock</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -147,10 +188,11 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>${exec-maven-plugin.version}</version>
                 <configuration>
                     <executable>java</executable>
                     <arguments>
@@ -159,15 +201,15 @@
                         <argument>-noverify</argument>
                         <argument>-XX:TieredStopAtLevel=1</argument>
                         <argument>-Dcom.sun.management.jmxremote</argument>
-                        <argument>-javaagent:agent/springloaded-1.2.8.RELEASE.jar</argument>
                         <argument>${exec.mainClass}</argument>
                     </arguments>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.6.1</version>
+                <version>${gmavenplus-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -183,84 +225,224 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                        <arg>-Xplugin:Manifold strings exceptions</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.10</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-inject-java</artifactId>
+                            <version>${micronaut.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-validation</artifactId>
+                            <version>${micronaut.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.data</groupId>
+                            <artifactId>micronaut-data-processor</artifactId>
+                            <version>1.0.0.M3</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test-compile</id>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>-parameters</arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                    <version>1.18.10</version>
+                                </path>
+                                <path>
+                                    <groupId>io.micronaut</groupId>
+                                    <artifactId>micronaut-inject-java</artifactId>
+                                    <version>${micronaut.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>io.micronaut</groupId>
+                                    <artifactId>micronaut-validation</artifactId>
+                                    <version>${micronaut.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>io.micronaut.data</groupId>
+                                    <artifactId>micronaut-data-processor</artifactId>
+                                    <version>1.0.0.M3</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <detail>true</detail>
+                    <useFile>false</useFile>
+                    <includes>
+                        <include>**/*Spec.*</include>
+                        <include>**/*Test.*</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <application.home>${project.basedir}</application.home>
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/*FT.groovy</include>
+                        <include>**/*FT.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker-maven-plugin.version}</version>
+                <configuration>
+                    <!-- A single's image configuration -->
+                    <images>
+                        <image>
+                            <external>
+                                <type>properties</type>
+                                <prefix>postgres.docker</prefix>
+                            </external>
+                        </image>
+                    </images>
+                </configuration>
+
+                <!-- Connect start/stop to pre- and
+                post-integration-test phase, respectively if you want to start
+                your docker containers during integration tests -->
+                <executions>
+                    <execution>
+                        <id>preemptive-stop</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java</source>
+                                <source>src/main/groovy</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                                <source>src/test/groovy</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                    <configuration>
-                        <detail>true</detail>
-                        <includes>
-                            <include>%regex[.*]</include>
-                        </includes>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven-failsafe-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
-                    <configuration>
-                        <compilerArgs>
-                            <arg>-parameters</arg>
-                        </compilerArgs>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>io.micronaut</groupId>
-                                <artifactId>micronaut-inject-java</artifactId>
-                                <version>1.2.5</version>
-                            </path>
-                            <path>
-                                <groupId>io.micronaut</groupId>
-                                <artifactId>micronaut-validation</artifactId>
-                                <version>1.2.5</version>
-                            </path>
-                        </annotationProcessorPaths>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>test-compile</id>
-                            <goals>
-                                <goal>testCompile</goal>
-                            </goals>
-                            <configuration>
-                                <compilerArgs>
-                                    <arg>-parameters</arg>
-                                </compilerArgs>
-                                <annotationProcessorPaths>
-                                    <path>
-                                        <groupId>io.micronaut</groupId>
-                                        <artifactId>micronaut-inject-java</artifactId>
-                                        <version>1.2.5</version>
-                                    </path>
-                                    <path>
-                                        <groupId>io.micronaut</groupId>
-                                        <artifactId>micronaut-validation</artifactId>
-                                        <version>1.2.5</version>
-                                    </path>
-                                </annotationProcessorPaths>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+
     </build>
+
     <pluginRepositories>
+
         <pluginRepository>
             <id>bintray</id>
             <name>Groovy Bintray</name>
